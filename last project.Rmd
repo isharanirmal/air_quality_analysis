@@ -1,0 +1,73 @@
+```{r}
+install.packages(c("readxl","dplyr","ggplot2","tidyr","GGally","broom","caret","patchwork","scales","janitor"))
+
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(GGally)
+library(broom)
+library(caret)
+library(patchwork)
+library(scales)
+library(janitor)
+```
+
+
+
+
+```{r}
+data <- read_excel("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_quality_database_version_2024_(v6.1)ok.xlsx")
+
+```
+```{r}
+data <- data %>% janitor::clean_names()
+```
+
+
+
+
+```{r}
+glimpse(data)
+```
+
+
+
+
+```{r}
+head(data)
+```
+```{r}
+expected_cols <- c("pm10_concentration","pm25_concentration","no2_concentration",
+                   "pm10_tempcov","pm25_tempcov","no2_tempcov",
+                   "country_name","city","year","population","latitude","longitude")
+
+```
+
+```{r}
+num_cols <- intersect(names(data), c("pm10_concentration","pm25_concentration","no2_concentration",
+                                     "pm10_tempcov","pm25_tempcov","no2_tempcov",
+                                     "population","latitude","longitude"))
+
+```
+
+
+
+
+```{r}
+data_clean <- data %>%
+  mutate(across(all_of(num_cols),
+                ~ na_if(., "NA") %>% as.character() %>% gsub(",", "", .) %>% as.numeric()))
+
+```
+
+
+```{r}
+pollutants <- data %>%
+  select(country_name ,city , year,pm25_concentration ,pm10_tempcov , `NO2`, `SO2`, `O3`)
+
+```
+

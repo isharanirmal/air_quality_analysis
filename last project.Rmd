@@ -66,8 +66,5 @@ data_clean <- data %>%
 
 
 ```{r}
-pollutants <- data %>%
-  select(country_name ,city , year,pm25_concentration ,pm10_tempcov , `NO2`, `SO2`, `O3`)
-
 ```
 

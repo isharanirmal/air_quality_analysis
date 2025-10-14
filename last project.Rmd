@@ -66,5 +66,9 @@ data_clean <- data %>%
 
 
 ```{r}
+data_clean <- data %>%
+  mutate(across(all_of(num_cols),
+                ~ na_if(., "NA") %>% as.character() %>% gsub(",", "", .) %>% as.numeric()))
+
 ```
 

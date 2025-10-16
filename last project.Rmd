@@ -23,8 +23,9 @@ library(janitor)
 data <- read_excel("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_quality_database_version_2024_(v6.1)ok.xlsx")
 
 ```
+
 ```{r}
-data <- data %>% janitor::clean_names()
+colnames(data)
 ```
 
 
@@ -40,35 +41,62 @@ glimpse(data)
 ```{r}
 head(data)
 ```
+
 ```{r}
-expected_cols <- c("pm10_concentration","pm25_concentration","no2_concentration",
-                   "pm10_tempcov","pm25_tempcov","no2_tempcov",
-                   "country_name","city","year","population","latitude","longitude")
+colSums(is.na(data))
 
 ```
-
 ```{r}
-num_cols <- intersect(names(data), c("pm10_concentration","pm25_concentration","no2_concentration",
-                                     "pm10_tempcov","pm25_tempcov","no2_tempcov",
-                                     "population","latitude","longitude"))
-
-```
+pm2_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm2|pm_2|pm25")]
+pm10_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm10|pm_10")]
 
 
-
-
-```{r}
-data_clean <- data %>%
-  mutate(across(all_of(num_cols),
-                ~ na_if(., "NA") %>% as.character() %>% gsub(",", "", .) %>% as.numeric()))
-
+pm25_col <- pm2_candidates[1]
+pm10_col <- pm10_candidates[1]
 ```
 
 
+
 ```{r}
-data_clean <- data %>%
-  mutate(across(all_of(num_cols),
-                ~ na_if(., "NA") %>% as.character() %>% gsub(",", "", .) %>% as.numeric()))
+library(tidyverse)
+```
+
+
+
+
+```{r}
+df <- data %>%
+mutate(
+PM25 = parse_number(as.character(.data[[pm25_col]])),
+PM10 = parse_number(as.character(.data[[pm10_col]]))
+) %>%
+filter(!is.na(PM25) & !is.na(PM10))
+df
+```
+
+
+```{r}
+df %>%
+summarize(
+n = n(),
+PM25_mean = mean(PM25, na.rm = TRUE),
+PM10_mean = mean(PM10, na.rm = TRUE),
+PM25_median = median(PM25, na.rm = TRUE),
+PM10_median = median(PM10, na.rm = TRUE)
+)
+```
+
+```{r}
+ggplot(df, aes(x = PM10, y = PM25)) +
+geom_point(alpha = 0.4, color = "#2c7fb8") +
+geom_smooth(method = "lm", se = TRUE, color = "#d95f0e") +
+labs(
+title = "Scatter Plot: PM2.5 vs PM10",
+subtitle = "Linear regression fit with 95% confidence interval",
+x = "PM10 (µg/m³)",
+y = "PM2.5 (µg/m³)"
+) +
+theme_minimal()
 
 ```
 

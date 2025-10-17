@@ -47,6 +47,11 @@ colSums(is.na(data))
 
 ```
 ```{r}
+library(tidyverse)
+```
+
+
+```{r}
 pm2_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm2|pm_2|pm25")]
 pm10_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm10|pm_10")]
 
@@ -54,13 +59,6 @@ pm10_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm10|pm_1
 pm25_col <- pm2_candidates[1]
 pm10_col <- pm10_candidates[1]
 ```
-
-
-
-```{r}
-library(tidyverse)
-```
-
 
 
 
@@ -97,6 +95,67 @@ x = "PM10 (µg/m³)",
 y = "PM2.5 (µg/m³)"
 ) +
 theme_minimal()
+
+```
+```{r}
+cor_test <- cor.test(df$PM10, df$PM25, method = "pearson")
+tidy(cor_test)
+```
+```{r}
+lm_fit <- lm(PM25 ~ PM10, data = df)
+summary(lm_fit)
+glance(lm_fit)
+```
+```{r}
+
+install.packages("ggpmisc")
+install.packages("ggpubr")   
+
+
+```
+
+```{r}
+library(ggplot2)
+library(ggpmisc)
+
+```
+
+
+```{r}
+ggplot(df, aes(x = PM10, y = PM25)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, color = "#e41a1c") +
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")),
+               label.x = 0.1, label.y = max(df$PM25, na.rm = TRUE)*0.9,
+               formula = y ~ x, parse = TRUE, size = 4, color = "blue") +
+  labs(
+    title = "Linear Regression: PM2.5 ~ PM10",
+    x = "PM10 (µg/m³)",
+    y = "PM2.5 (µg/m³)"
+  ) +
+  theme_light()
+
+```
+```{r}
+par(mfrow = c(2,2))
+plot(lm_fit)
+par(mfrow = c(1,1))
+```
+```{r}
+library(caret)
+```
+
+
+
+```{r}
+set.seed(42)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+caret_lm <- train(PM25 ~ PM10,
+data = df,
+method = "lm",
+trControl = train_control)
+caret_lm$results
 
 ```
 

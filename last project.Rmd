@@ -4,16 +4,16 @@ install.packages(c("readxl","dplyr","ggplot2","tidyr","GGally","broom","caret","
 ```
 
 ```{r}
-library(readxl)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(GGally)
-library(broom)
-library(caret)
-library(patchwork)
-library(scales)
-library(janitor)
+library(readxl)    # To read Excel files (.xlsx)
+library(dplyr)     # For data manipulation (filter, select, summarize, etc.)
+library(ggplot2)   # For creating data visualizations (graphs, plots)
+library(tidyr)     # For reshaping and tidying data
+library(GGally)    # Adds extra ggplot2 features (like pair plots)
+library(broom)     # Converts model outputs into tidy data frames
+library(caret)     # For machine learning and model training
+library(patchwork) # To combine multiple ggplot2 charts
+library(scales)    # For controlling scales and labels in plots
+library(janitor)   # For cleaning data (fixing column names, removing empty rows, etc.)
 ```
 
 
@@ -25,7 +25,7 @@ data <- read_excel("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_qu
 ```
 
 ```{r}
-colnames(data)
+colnames(data)  # show the column names of the data frame called data.
 ```
 
 
@@ -47,16 +47,25 @@ colSums(is.na(data))
 
 ```
 ```{r}
+data$year[is.na(data$year)] <- mean(data$year, na.rm = TRUE)
+```
+
+```{r}
+colSums(is.na(data))
+```
+
+
+```{r}
 library(tidyverse)
 ```
 
 
 ```{r}
-pm2_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm2|pm_2|pm25")]
+pm2_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm2|pm_2|pm25")] #Get all column names/Convert to lowercase/Detect PM2.5 column(s)
 pm10_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm10|pm_10")]
 
 
-pm25_col <- pm2_candidates[1]
+pm25_col <- pm2_candidates[1] #Store PM2.5 column name
 pm10_col <- pm10_candidates[1]
 ```
 
@@ -65,10 +74,10 @@ pm10_col <- pm10_candidates[1]
 ```{r}
 df <- data %>%
 mutate(
-PM25 = parse_number(as.character(.data[[pm25_col]])),
+PM25 = parse_number(as.character(.data[[pm25_col]])), #Create two new columns (PM25 and PM10) in clean numeric format.
 PM10 = parse_number(as.character(.data[[pm10_col]]))
 ) %>%
-filter(!is.na(PM25) & !is.na(PM10))
+filter(!is.na(PM25) & !is.na(PM10)) #Keep only rows that have both PM2.5 and PM10 values.
 df
 ```
 

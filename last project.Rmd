@@ -85,12 +85,12 @@ df
 ```{r}
 df %>%
 summarize(
-n = n(),
-PM25_mean = mean(PM25, na.rm = TRUE),
+n = n(),    #Counts the number of rows in the dataset.
+PM25_mean = mean(PM25, na.rm = TRUE), #Calculates the mean (average) of PM2.5 and PM10.
 PM10_mean = mean(PM10, na.rm = TRUE),
-PM25_median = median(PM25, na.rm = TRUE),
+PM25_median = median(PM25, na.rm = TRUE), #Calculates the median of PM2.5 and PM10.
 PM10_median = median(PM10, na.rm = TRUE)
-)
+) #🔹 na.rm = TRUE → Ignores missing (NA) values when doing the calculations.
 ```
 
 ```{r}

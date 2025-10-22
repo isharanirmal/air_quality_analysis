@@ -103,22 +103,30 @@ subtitle = "Linear regression fit with 95% confidence interval",
 x = "PM10 (µg/m³)",
 y = "PM2.5 (µg/m³)"
 ) +
-theme_minimal()
+theme_minimal() #Applies a clean minimal theme
 
 ```
 ```{r}
-cor_test <- cor.test(df$PM10, df$PM25, method = "pearson")
-tidy(cor_test)
+cor_test <- cor.test(df$PM10, df$PM25, method = "pearson") #Calculates the Pearson correlation coefficient (r) between PM10 and PM2.5 to measure their linear relationship.
+tidy(cor_test) #Converts the test result into a clean, easy-to-read table
 ```
 ```{r}
-lm_fit <- lm(PM25 ~ PM10, data = df)
-summary(lm_fit)
-glance(lm_fit)
+lm_fit <- lm(PM25 ~ PM10, data = df) #Fits a linear regression model where PM25 is the dependent variable and PM10 is the independent variable.
+# In other words, it models how PM25 changes as PM10 changes.
+summary(lm_fit) #Shows a detailed summary of the model, including:
+                #Coefficients (intercept and slope)
+                #R-squared (how well PM10 explains PM25)
+                #p-values (significance of the relationship)
+                #Residuals and other diagnostics
+glance(lm_fit) #Gives a compact summary table (from the broom package) with key model metrics such as:
+               #r.squared and adj.r.squared
+               #p.value for the overall model
+               #AIC, BIC, sigma, etc.
 ```
 ```{r}
 
-install.packages("ggpmisc")
-install.packages("ggpubr")   
+install.packages("ggpmisc") #Installs the ggpmisc package, which provides extra tools for annotating ggplots — for example, adding regression equations, R² values, and correlation coefficients directly on plots.
+install.packages("ggpubr") #Installs the ggpubr package, which makes it easier to create publication-ready ggplots with simpler syntax (e.g., adding mean comparisons, boxplots, and correlation plots easily).  
 
 
 ```

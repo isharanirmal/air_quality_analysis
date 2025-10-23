@@ -154,12 +154,18 @@ ggplot(df, aes(x = PM10, y = PM25)) +
 
 ```
 ```{r}
-par(mfrow = c(2,2))
-plot(lm_fit)
-par(mfrow = c(1,1))
+par(mfrow = c(2,2)) # divides the plotting area into a 2×2 grid (so four plots appear together).
+plot(lm_fit) # draws the diagnostic plots for the regression model (Residuals, Q–Q plot, Scale–Location, and Residuals vs Leverage).
+par(mfrow = c(1,1)) # resets the plotting layout back to normal (1 plot per page).
 ```
 ```{r}
-library(caret)
+library(caret) # Building and training machine learning models (like linear regression, decision trees, etc.)
+
+               # Doing cross-validation (model testing)
+
+               # Calculating model accuracy, RMSE, and R²
+
+               # Simplifying the workflow for data splitting, preprocessing, and tuning
 ```
 
 

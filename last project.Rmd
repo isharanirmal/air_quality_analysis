@@ -171,14 +171,23 @@ library(caret) # Building and training machine learning models (like linear regr
 
 
 ```{r}
-set.seed(42)
-train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+set.seed(42) # Sets a random seed so results are reproducible (you get the same results each time you run it).
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3) # Creates the cross-validation setup.
+                                                                               # method = "repeatedcv" → use repeated k-fold cross-validation.
+                                                                               # number = 10 → divide the data into 10 folds.
+                                                                               # repeats = 3 → repeat the 10-fold process three times for more stable accuracy.
 
 caret_lm <- train(PM25 ~ PM10,
 data = df,
 method = "lm",
-trControl = train_control)
-caret_lm$results
+trControl = train_control) # Trains a linear regression model (lm) using caret,
+                           # where PM25 is predicted from PM10,
+                           # and the training process follows the train_control (cross-validation setup).
+caret_lm$results           
+# Displays the model performance metrics — such as:
+                           # RMSE → Root Mean Square Error (lower is better)  
+                           # R² → how well PM10 explains PM2.5 (higher is better)
+                           # MAE → Mean Absolute Error
 
 ```
 

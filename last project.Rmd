@@ -17,7 +17,7 @@ install.packages(c("readxl","dplyr","ggplot2","tidyr","GGally","broom","caret","
 ```
 
 ```{r}
-library(readxl)    # To read Excel files (.xlsx)
+library(readr)    # To read Excel files (.xlsx)
 library(dplyr)     # For data manipulation (filter, select, summarize, etc.)
 library(ggplot2)   # For creating data visualizations (graphs, plots)
 library(tidyr)     # For reshaping and tidying data
@@ -33,7 +33,7 @@ library(janitor)   # For cleaning data (fixing column names, removing empty rows
 
 
 ```{r}
-data <- read_excel("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_quality_database_version_2024_(v6.1)ok.xlsx")
+data <- read_csv("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_quality_database_version_2024_(v6.1) (1).csv")
 
 ```
 
@@ -48,6 +48,9 @@ colnames(data)  # show the column names of the data frame called data.
 glimpse(data)
 ```
 
+```{r}
+View(data)
+```
 
 
 
@@ -60,8 +63,12 @@ colSums(is.na(data))
 
 ```
 ```{r}
-data$year[is.na(data$year)] <- mean(data$year, na.rm = TRUE)
+data$pm25_concentration[is.na(data$pm25_concentration)] <- median(data$pm25_concentration, na.rm = TRUE)
+data$pm10_concentration[is.na(data$pm10_concentration)] <- median(data$pm10_concentration, na.rm = TRUE)
+data$no2_concentration[is.na(data$no2_concentration)] <- median(data$no2_concentration, na.rm = TRUE)
+
 ```
+
 
 ```{r}
 colSums(is.na(data))

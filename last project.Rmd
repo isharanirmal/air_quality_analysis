@@ -1,32 +1,23 @@
 
 ---
 title: "Scenario C – Correlational Analyst"
-author: "Your Name"
-date: "`r Sys.Date()`"
-output: html_document
+author: "Ishara Nirmal"
+date: "2025/11/06"
+output: Rnotebook
 ---
 
-
-
-
-
-
 ```{r}
-install.packages(c("readxl","dplyr","ggplot2","tidyr","GGally","broom","caret","patchwork","scales","janitor"))
+install.packages(c("readr","dplyr","ggplot2","tidyr","GGally","broom"))
 
 ```
 
 ```{r}
-library(readr)    # To read Excel files (.xlsx)
-library(dplyr)     # For data manipulation (filter, select, summarize, etc.)
-library(ggplot2)   # For creating data visualizations (graphs, plots)
-library(tidyr)     # For reshaping and tidying data
-library(GGally)    # Adds extra ggplot2 features (like pair plots)
-library(broom)     # Converts model outputs into tidy data frames
-library(caret)     # For machine learning and model training
-library(patchwork) # To combine multiple ggplot2 charts
-library(scales)    # For controlling scales and labels in plots
-library(janitor)   # For cleaning data (fixing column names, removing empty rows, etc.)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(GGally)
+library(broom)
 ```
 
 
@@ -40,9 +31,6 @@ data <- read_csv("C:\\Users\\admin\\OneDrive\\Desktop\\DPR\\who_ambient_air_qual
 ```{r}
 colnames(data)  # show the column names of the data frame called data.
 ```
-
-
-
 
 ```{r}
 glimpse(data)
@@ -75,148 +63,66 @@ colSums(is.na(data))
 ```
 
 ```{r}
-install.packages("naniar")
-library(naniar)
-gg_miss_var(data) + 
-  labs(title = "Missing Values per Column") +
-  theme_minimal()
-
-```
-
-
-```{r}
-library(tidyverse)
-```
-
-
-```{r}
-pm2_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm2|pm_2|pm25")] #Get all column names/Convert to lowercase/Detect PM2.5 column(s)
-pm10_candidates <- colnames(data)[str_detect(tolower(colnames(data)), "pm10|pm_10")]
-
-
-pm25_col <- pm2_candidates[1] #Store PM2.5 column name
-pm10_col <- pm10_candidates[1]
-```
-
-
-
-```{r}
-df <- data %>%
-mutate(
-PM25 = parse_number(as.character(.data[[pm25_col]])), #Create two new columns (PM25 and PM10) in clean numeric format.
-PM10 = parse_number(as.character(.data[[pm10_col]]))
-) %>%
-filter(!is.na(PM25) & !is.na(PM10)) #Keep only rows that have both PM2.5 and PM10 values.
-df
-```
-
-
-```{r}
-df %>%
-summarize(
-n = n(),    #Counts the number of rows in the dataset.
-PM25_mean = mean(PM25, na.rm = TRUE), #Calculates the mean (average) of PM2.5 and PM10.
-PM10_mean = mean(PM10, na.rm = TRUE),
-PM25_median = median(PM25, na.rm = TRUE), #Calculates the median of PM2.5 and PM10.
-PM10_median = median(PM10, na.rm = TRUE)
-) #🔹 na.rm = TRUE → Ignores missing (NA) values when doing the calculations.
-```
-
-```{r}
-ggplot(df, aes(x = PM10, y = PM25)) +
-geom_point(alpha = 0.4, color = "#2c7fb8") +
-geom_smooth(method = "lm", se = TRUE, color = "#d95f0e") +
-labs(
-title = "Scatter Plot: PM2.5 vs PM10",
-subtitle = "Linear regression fit with 95% confidence interval",
-x = "PM10 (µg/m³)",
-y = "PM2.5 (µg/m³)"
-) +
-theme_minimal() #Applies a clean minimal theme
-
-```
-```{r}
-cor_test <- cor.test(df$PM10, df$PM25, method = "pearson") #Calculates the Pearson correlation coefficient (r) between PM10 and PM2.5 to measure their linear relationship.
-tidy(cor_test) #Converts the test result into a clean, easy-to-read table
-```
-```{r}
-lm_fit <- lm(PM25 ~ PM10, data = df) #Fits a linear regression model where PM25 is the dependent variable and PM10 is the independent variable.
-# In other words, it models how PM25 changes as PM10 changes.
-summary(lm_fit) #Shows a detailed summary of the model, including:
-                #Coefficients (intercept and slope)
-                #R-squared (how well PM10 explains PM25)
-                #p-values (significance of the relationship)
-                #Residuals and other diagnostics
-glance(lm_fit) #Gives a compact summary table (from the broom package) with key model metrics such as:
-               #r.squared and adj.r.squared
-               #p.value for the overall model
-               #AIC, BIC, sigma, etc.
-```
-```{r}
-
-install.packages("ggpmisc") #Installs the ggpmisc package, which provides extra tools for annotating ggplots — for example, adding regression equations, R² values, and correlation coefficients directly on plots.
-install.packages("ggpubr") #Installs the ggpubr package, which makes it easier to create publication-ready ggplots with simpler syntax (e.g., adding mean comparisons, boxplots, and correlation plots easily).  
-
+data$year[is.na(data$year)] <- median(data$year, na.rm = TRUE)
+data <- data %>%
+  select(-reference, -web_link, -population_source, -pm10_tempcov, -pm25_tempcov, -no2_tempcov, -type_of_stations, -population )
 
 ```
 
 ```{r}
-library(ggplot2)
-library(ggpmisc)
+data <- data %>%
+  filter(!is.na(latitude), !is.na(longitude))
+colSums(is.na(data))
 
+```
+```{r}
+data_clean <- data %>%
+  select(country_name, city, year, 
+         pm10_concentration, pm25_concentration, no2_concentration)
+data
 ```
 
 
 ```{r}
-ggplot(df, aes(x = PM10, y = PM25)) +
-  geom_point(alpha = 0.3) +
-  geom_smooth(method = "lm", se = TRUE, color = "#e41a1c") +
-  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")),
-               label.x = 0.1, label.y = max(df$PM25, na.rm = TRUE)*0.9,
-               formula = y ~ x, parse = TRUE, size = 4, color = "blue") +
+df_corr <- data %>% select(pm10_concentration, pm25_concentration, no2_concentration)
+cor(df_corr, use = "complete.obs", method = "pearson")
+
+```
+```{r}
+GGally::ggpairs(df_corr)
+
+```
+
+```{r}
+
+
+ggplot(data, aes(x = pm10_concentration, y = pm25_concentration)) +
+  geom_point(alpha = 0.3, size = 1.5, color = "darkblue") +  
+  geom_smooth(method = "lm", se = TRUE, color = "red", size = 1) +  
   labs(
-    title = "Linear Regression: PM2.5 ~ PM10",
+    title = "PM10 vs PM2.5 Concentrations",
     x = "PM10 (µg/m³)",
     y = "PM2.5 (µg/m³)"
   ) +
-  theme_light()
+  theme_minimal(base_size = 14)  
 
 ```
-```{r}
-par(mfrow = c(2,2)) # divides the plotting area into a 2×2 grid (so four plots appear together).
-plot(lm_fit) # draws the diagnostic plots for the regression model (Residuals, Q–Q plot, Scale–Location, and Residuals vs Leverage).
-par(mfrow = c(1,1)) # resets the plotting layout back to normal (1 plot per page).
-```
-```{r}
-library(caret) # Building and training machine learning models (like linear regression, decision trees, etc.)
-
-               # Doing cross-validation (model testing)
-
-               # Calculating model accuracy, RMSE, and R²
-
-               # Simplifying the workflow for data splitting, preprocessing, and tuning
-```
-
 
 
 ```{r}
-set.seed(42) # Sets a random seed so results are reproducible (you get the same results each time you run it).
-train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3) # Creates the cross-validation setup.
-                                                                               # method = "repeatedcv" → use repeated k-fold cross-validation.
-                                                                               # number = 10 → divide the data into 10 folds.
-                                                                               # repeats = 3 → repeat the 10-fold process three times for more stable accuracy.
-
-caret_lm <- train(PM25 ~ PM10,
-data = df,
-method = "lm",
-trControl = train_control) # Trains a linear regression model (lm) using caret,
-                           # where PM25 is predicted from PM10,
-                           # and the training process follows the train_control (cross-validation setup).
-caret_lm$results           
-# Displays the model performance metrics — such as:
-                           # RMSE → Root Mean Square Error (lower is better)  
-                           # R² → how well PM10 explains PM2.5 (higher is better)
-                           # MAE → Mean Absolute Error
+model <- lm(pm25_concentration ~ pm10_concentration, data = data)
+summary(model)
 
 ```
+```{r}
+cor_test <- cor.test(data$pm25_concentration, data$pm10_concentration, method = "pearson")
+cor_test
+
+```
+
+
+
+
+
+
 

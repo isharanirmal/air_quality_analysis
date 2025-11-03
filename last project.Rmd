@@ -83,11 +83,16 @@ data
 ```
 
 
+
 ```{r}
+
 df_corr <- data %>% select(pm10_concentration, pm25_concentration, no2_concentration)
 cor(df_corr, use = "complete.obs", method = "pearson")
 
+
 ```
+
+
 ```{r}
 install.packages("corrplot")
 library(corrplot)

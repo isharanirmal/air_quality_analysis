@@ -89,6 +89,20 @@ cor(df_corr, use = "complete.obs", method = "pearson")
 
 ```
 ```{r}
+install.packages("corrplot")
+library(corrplot)
+
+corr_matrix <- cor(df_corr, use = "complete.obs", method = "pearson")
+
+corrplot(corr_matrix, method = "color", addCoef.col = "black",
+         tl.col = "black", tl.srt = 45,
+         title = "Correlation Matrix of Air Pollutants", mar = c(0,0,2,0))
+
+```
+
+
+
+```{r}
 GGally::ggpairs(df_corr)
 
 ```

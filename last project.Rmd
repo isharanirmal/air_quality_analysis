@@ -92,7 +92,6 @@ cor(df_corr, use = "complete.obs", method = "pearson")
 
 ```
 
-
 ```{r}
 install.packages("corrplot")
 library(corrplot)
@@ -102,8 +101,8 @@ corr_matrix <- cor(df_corr, use = "complete.obs", method = "pearson")
 corrplot(corr_matrix, method = "color", addCoef.col = "black",
          tl.col = "black", tl.srt = 45,
          title = "Correlation Matrix of Air Pollutants", mar = c(0,0,2,0))
-
 ```
+
 
 
 
@@ -112,20 +111,7 @@ GGally::ggpairs(df_corr)
 
 ```
 
-```{r}
 
-
-ggplot(data, aes(x = pm10_concentration, y = pm25_concentration)) +
-  geom_point(alpha = 0.3, size = 1.5, color = "darkblue") +  
-  geom_smooth(method = "lm", se = TRUE, color = "red", size = 1) +  
-  labs(
-    title = "PM10 vs PM2.5 Concentrations",
-    x = "PM10 (µg/m³)",
-    y = "PM2.5 (µg/m³)"
-  ) +
-  theme_minimal(base_size = 14)  
-
-```
 
 
 ```{r}
@@ -133,6 +119,8 @@ model <- lm(pm25_concentration ~ pm10_concentration, data = data)
 summary(model)
 
 ```
+
+
 ```{r}
 cor_test <- cor.test(data$pm25_concentration, data$pm10_concentration, method = "pearson")
 cor_test
@@ -140,6 +128,21 @@ cor_test
 ```
 
 
+```{r}
+avg_pollutants <- data %>%
+  summarize(
+    PM25 = mean(pm25_concentration, na.rm = TRUE),
+    PM10 = mean(pm10_concentration, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "Pollutant", values_to = "Mean")
+
+ggplot(avg_pollutants, aes(x = Pollutant, y = Mean, fill = Pollutant)) +
+  geom_col(width = 0.6) +
+  labs(title = "Average Concentration Comparison: PM2.5 vs PM10",
+       y = "Mean Concentration (µg/m³)") +
+  theme_minimal(base_size = 14) +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e"))
+```
 
 
 
